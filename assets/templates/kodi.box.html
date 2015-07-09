@@ -1,0 +1,134 @@
+<div class="text-center">
+  <div class="btn-group">
+    <button ng-click="vm.view = 'remote'" ng-class="{active: vm.view == 'remote'}" class="btn btn-primary">
+      <i class="fa fa-calculator"></i>
+      <span class="hidden-xd">Télécommande</span>
+    </button>
+    <button ng-click="vm.view = 'settings'" ng-class="{active: vm.view == 'settings'}" class="btn btn-primary">
+      <i class="fa fa-cogs"></i>
+      <span class="hidden-xd">Réglages</span>
+    </button>
+  </div>
+</div>
+
+<hr>
+
+<div ng-show="vm.view == 'remote' && vm.devices.length > 0">
+  
+  <div ng-show="vm.devices.length > 0">
+    <div class="row_remote text-center">
+      <select ng-model="remote_id" class="form-control">
+        <option ng-repeat="device in vm.devices" value="{{device.id}}">{{device.name}}</option>
+      </select>
+      <hr>
+    </div>
+    <div ng-show="remote_id">
+      <div class="row_remote btn-circle text-center">
+        <button ng-click="vm.remoteDevice(remote_id, 'back')" class="btn btn-default"><i class="fa fa-undo"></i></button>
+        <button ng-click="vm.remoteDevice(remote_id, 'up')" class="btn btn-primary"><i class="fa fa-chevron-up"></i></button>
+        <button ng-click="vm.remoteDevice(remote_id, 'osd')" class="btn btn-default"><i class="fa fa-home"></i></button>
+      </div>
+      <div class="row_remote btn-circle text-center">
+        <button ng-click="vm.remoteDevice(remote_id, 'left')" class="btn btn-primary"><i class="fa fa-chevron-left"></i></button>
+        <button ng-click="vm.remoteDevice(remote_id, 'select')" class="btn btn-primary">OK</button>
+        <button ng-click="vm.remoteDevice(remote_id, 'right')" class="btn btn-primary"><i class="fa fa-chevron-right"></i></button>
+      </div>
+      <div class="row_remote btn-circle text-center">
+        <button ng-click="vm.remoteDevice(remote_id, 'contextmenu')" class="btn btn-default"><i class="fa fa-bars"></i></button>
+        <button ng-click="vm.remoteDevice(remote_id, 'down')" class="btn btn-primary"><i class="fa fa-chevron-down"></i></button>
+        <button ng-click="vm.remoteDevice(remote_id, 'info')" class="btn btn-default"><i class="fa fa-info"></i></button>
+      </div>
+      <div class="row_remote btn-circle text-center">
+        <button ng-click="vm.remoteDevice(remote_id, 'pause')" class="btn btn-default"><i class="fa fa-play"></i></button>
+        <button ng-click="vm.remoteDevice(remote_id, 'stop')" class="btn btn-default"><i class="fa fa-stop"></i></button>
+      </div>
+    </div>
+  </div>
+  <div ng-show="vm.devices.length == 0">
+    <div class="alert alert-info">
+      <i class="fa fa-info"></i>
+      Vous n'avez pas encore ajouter d'appareil. Cliquez sur réglages.
+    </div>
+  </div>
+
+</div>
+<div ng-show="vm.view == 'settings'">
+
+  <div ng-show="vm.settings_view == 'devices'">
+    <table class="table" ng-show="vm.devices.length > 0" style="margin-bottom:20px;">
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Pièce</th>
+          <th>Utilisateur</th>
+          <th>Editer</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="device in vm.devices">
+          <td>{{device.name}}</td>
+          <td>{{device.room.name}}</td>
+          <td>{{device.user.firstname}} {{device.user.lastname}}</td>
+          <td>
+            <button ng-click="vm.viewEdit(device)" class="btn btn-primary btn-xs">Editer</button> 
+            <button ng-click="vm.destroyDevice(device.id)" class="btn btn-danger btn-xs">Supprimer</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="form-group">
+      <button class="btn btn-block btn-primary" ng-click="vm.settings_view = 'new'"><i class="fa fa-plus"></i> Ajouter un appareil</button>
+    </div>
+  </div>
+
+  <div ng-show="vm.settings_view == 'new'">
+    <div class="form-group">
+      <input ng-model="vm.new_device.name" type="text" class="form-control" placeholder="Nom affiché sur gladys">
+    </div>
+    <div class="form-group">
+      <input ng-model="vm.new_device.host" type="text" class="form-control"placeholder="IP ou nom de domaine">
+    </div>
+    <div class="form-group">
+      <input ng-model="vm.new_device.port" type="text" class="form-control" placeholder="Port d'accès">
+    </div>
+    <div class="form-group">
+      <select ng-model="vm.new_device.room" class="form-control">
+        <option ng-repeat="room in vm.rooms" value="{{room.id}}">{{room.name}}</option>
+      </select>
+    </div>
+    <div class="row form-group">
+      <div class="col-xs-6">
+        <button class="btn btn-block btn-warning" ng-click="vm.settings_view = 'devices'">Retour</button>
+      </div>
+      <div class="col-xs-6">
+        <button class="btn btn-block btn-primary" ng-click="vm.addDevice(vm.new_device)">Envoyer</button>
+      </div>
+    </div>
+  </div>
+
+  <div ng-show="vm.settings_view == 'device'">
+    <div class="form-group">
+      <input ng-model="vm.device.name" type="text" class="form-control" placeholder="Nom affiché sur gladys">
+    </div>
+    <div class="form-group">
+      <input ng-model="vm.device.host" type="text" class="form-control"placeholder="IP ou nom de domaine">
+    </div>
+    <div class="form-group">
+      <input ng-model="vm.device.port" type="text" class="form-control" placeholder="Port d'accès">
+    </div>
+    <div class="form-group">
+      <select ng-model="vm.device.room" class="form-control">
+        <option ng-repeat="room in vm.rooms" value="{{room.id}}">{{room.name}}</option>
+      </select>
+    </div>
+    <div class="row form-group">
+      <div class="col-xs-6">
+        <button class="btn btn-block btn-warning" ng-click="vm.settings_view = 'devices'">Retour</button>
+      </div>
+      <div class="col-xs-6">
+        <button class="btn btn-block btn-primary" ng-click="vm.updateDevice(vm.device)">Envoyer</button>
+      </div>
+    </div>
+  </div>
+
+</div>

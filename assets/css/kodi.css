@@ -1,0 +1,12 @@
+.row_remote {
+	max-width: 200px;
+	margin:5px auto;
+}
+.row_remote .btn{
+	width: 50px;
+	height: 50px;
+	border-radius:5px;
+}
+.row_remote.btn-circle .btn{
+	border-radius:25px;
+}

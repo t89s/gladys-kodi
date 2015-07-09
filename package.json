@@ -1,0 +1,11 @@
+{
+  "name": "Kodi/XBMC",
+  "version": "0.1",
+  "description": "Kodi remote and events for Gladys",
+  "keywords": [],
+  "dependencies": {
+    "sails-util-mvcsloader": "^0.1.5",
+  },
+  "author": "TimeLord",
+  "license": "Creative Commons 3.0 France"
+}
