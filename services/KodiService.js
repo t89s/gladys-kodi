@@ -20,6 +20,8 @@ module.exports = {
 			if(err) return callback(err);
 
 			Kodi.api(device, function(err, api){
+				if(err) return callback(err);
+
 				api.remote(method, callback);
 			});		
 		});
