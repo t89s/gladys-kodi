@@ -5,6 +5,16 @@ var haveRights = function(userId, deviceId, callback){
 	KodiDevice.findOne({user: userId, id: deviceId}, callback);
 }
 
+var connectionStatus = function(err, device, callback){
+	if(err == 'disconnected' && device.connected != 0){
+		return KodiDevice.update({id: device.id}, {connected: 0}, callback);
+	}
+	if(!err && device.connected != 1){
+		return KodiDevice.update({id: device.id}, {connected: 1}, callback);
+	}
+	callback(err, device);
+}
+
 module.exports = {
 
 	index : function(req, res, next){
@@ -20,9 +30,11 @@ module.exports = {
 			if(err) return res.json(err);
 
 			KodiService.remote(device.id, req.param('method'), function(err, value){
-				if(err) return res.json(err);
+				connectionStatus(err, device, function(err){
+					if(err) return res.json(err);
 
-				return res.json(value);
+					return res.json(value);
+				});
 			});
 		});
 	},
@@ -32,7 +44,8 @@ module.exports = {
 			name : req.param('name'),
 			host : req.param('host'),
 			port : req.param('port'),
-			room : req.param('room')
+			room : req.param('room'),
+			connected : 1
 		};
 
 		haveRights(req.session.User.id, req.param('id'), function(err, device){
@@ -113,9 +126,11 @@ module.exports = {
 					if(err) return res.json(err);
 
 					Kodi.event(value, function(err){
-						if(err) return res.json(err);
+						connectionStatus(err, value, function(err){
+							if(err) return res.json(err);
 
-						return res.json(value);
+							return res.json(value);
+						});
 					});
 
 				});
