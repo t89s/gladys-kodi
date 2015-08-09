@@ -1,8 +1,13 @@
+/**
+ * Routes rules
+ * @doc http://sailsjs.org/documentation/concepts/routes
+ */
 
-module.exports = {
-  '/index': 'KodiController.index',
-  '/add': 'KodiController.add',
-  '/remote': 'KodiController.remote',
-  '/destroy': 'KodiController.destroy',
-  '/update': 'KodiController.update'
+module.exports.routes = {
+  '/kodi/index': 'KodiController.index',
+  '/kodi/add': 'KodiController.add',
+  '/kodi/remote': 'KodiController.remote',
+  '/kodi/destroy': 'KodiController.destroy',
+  '/kodi/update': 'KodiController.update',
+  '/kodi/music/:name': 'KodiController.music'
 };

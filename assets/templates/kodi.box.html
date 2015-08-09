@@ -17,30 +17,30 @@
   
   <div ng-show="vm.devices.length > 0">
     <div class="row_remote text-center">
-      <select ng-model="remote_id" class="form-control">
-        <option ng-repeat="device in vm.devices" value="{{device.id}}">{{device.name}}</option>
-      </select>
+      <select ng-model="vm.deviceRemote" ng-options="device.name for device in vm.devices" class="form-control"></select>
       <hr>
     </div>
-    <div ng-show="remote_id">
+    <div ng-show="vm.deviceRemote.id">
+      <p ng-show="vm.deviceRemote.connected == 1" class="text-center text-success">Connecté</p>
+      <p ng-show="vm.deviceRemote.connected == 0" class="text-center text-danger">Déconnecté</p>
       <div class="row_remote btn-circle text-center">
-        <button ng-click="vm.remoteDevice(remote_id, 'back')" class="btn btn-default"><i class="fa fa-undo"></i></button>
-        <button ng-click="vm.remoteDevice(remote_id, 'up')" class="btn btn-primary"><i class="fa fa-chevron-up"></i></button>
-        <button ng-click="vm.remoteDevice(remote_id, 'osd')" class="btn btn-default"><i class="fa fa-home"></i></button>
+        <button ng-click="vm.remoteDevice('back')" class="btn btn-default"><i class="fa fa-undo"></i></button>
+        <button ng-click="vm.remoteDevice('up')" class="btn btn-primary"><i class="fa fa-chevron-up"></i></button>
+        <button ng-click="vm.remoteDevice('osd')" class="btn btn-default"><i class="fa fa-home"></i></button>
       </div>
       <div class="row_remote btn-circle text-center">
-        <button ng-click="vm.remoteDevice(remote_id, 'left')" class="btn btn-primary"><i class="fa fa-chevron-left"></i></button>
-        <button ng-click="vm.remoteDevice(remote_id, 'select')" class="btn btn-primary">OK</button>
-        <button ng-click="vm.remoteDevice(remote_id, 'right')" class="btn btn-primary"><i class="fa fa-chevron-right"></i></button>
+        <button ng-click="vm.remoteDevice('left')" class="btn btn-primary"><i class="fa fa-chevron-left"></i></button>
+        <button ng-click="vm.remoteDevice('select')" class="btn btn-primary">OK</button>
+        <button ng-click="vm.remoteDevice('right')" class="btn btn-primary"><i class="fa fa-chevron-right"></i></button>
       </div>
       <div class="row_remote btn-circle text-center">
-        <button ng-click="vm.remoteDevice(remote_id, 'contextmenu')" class="btn btn-default"><i class="fa fa-bars"></i></button>
-        <button ng-click="vm.remoteDevice(remote_id, 'down')" class="btn btn-primary"><i class="fa fa-chevron-down"></i></button>
-        <button ng-click="vm.remoteDevice(remote_id, 'info')" class="btn btn-default"><i class="fa fa-info"></i></button>
+        <button ng-click="vm.remoteDevice('contextmenu')" class="btn btn-default"><i class="fa fa-bars"></i></button>
+        <button ng-click="vm.remoteDevice('down')" class="btn btn-primary"><i class="fa fa-chevron-down"></i></button>
+        <button ng-click="vm.remoteDevice('info')" class="btn btn-default"><i class="fa fa-info"></i></button>
       </div>
       <div class="row_remote btn-circle text-center">
-        <button ng-click="vm.remoteDevice(remote_id, 'pause')" class="btn btn-default"><i class="fa fa-play"></i></button>
-        <button ng-click="vm.remoteDevice(remote_id, 'stop')" class="btn btn-default"><i class="fa fa-stop"></i></button>
+        <button ng-click="vm.remoteDevice('pause')" class="btn btn-default"><i class="fa fa-play"></i></button>
+        <button ng-click="vm.remoteDevice('stop')" class="btn btn-default"><i class="fa fa-stop"></i></button>
       </div>
     </div>
   </div>
@@ -58,6 +58,8 @@
     <table class="table" ng-show="vm.devices.length > 0" style="margin-bottom:20px;">
       <thead>
         <tr>
+          <th>Status</th>
+          <th>ID</th>
           <th>Nom</th>
           <th>Pièce</th>
           <th>Utilisateur</th>
@@ -66,6 +68,8 @@
       </thead>
       <tbody>
         <tr ng-repeat="device in vm.devices">
+          <td><i class="fa fa-square text-green" ng-class="{'text-red': device.connected == 0}"></i></td>
+          <td>{{device.id}}</td>
           <td>{{device.name}}</td>
           <td>{{device.room.name}}</td>
           <td>{{device.user.firstname}} {{device.user.lastname}}</td>

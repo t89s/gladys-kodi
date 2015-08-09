@@ -8,6 +8,7 @@
   kodiController.$inject = ['kodiService','roomService'];
 
   function kodiController(kodiService, roomService){
+  	/* jshint validthis: true */
 		var vm = this;
 
 		/* Method */
@@ -20,6 +21,7 @@
 		/* Infos */
 		vm.devices = [];
 		vm.rooms = [];
+		vm.deviceRemote = {};
 
 		/* Template config */
 		vm.view = 'remote';
@@ -50,8 +52,8 @@
         });
     }
 
-		function remoteDevice(id, method){
-			return kodiService.remoteDevice(id, method);
+		function remoteDevice(method){
+			return kodiService.remoteDevice(vm.deviceRemote.id, method);
 		}
 
 		function destroyDevice(id){

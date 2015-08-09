@@ -5,6 +5,11 @@ module.exports = function (sails) {
 
   sails.config.Event.on('sailsReady', function(){
 
+    KodiInstall.actionType(function(err){
+      if(err)return sails.log.error('Install Kodi actionType failed', err);
+      sails.log.info('Install Kodi actionType OK');
+    });
+
     KodiInstall.launcherType(function(err){
       if(err)return sails.log.error('Install Kodi launcherType failed', err);
       sails.log.info('Install Kodi launcherType OK');

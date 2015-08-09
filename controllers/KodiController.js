@@ -1,10 +1,29 @@
+/**
+ * Controller
+ * @doc http://sailsjs.org/documentation/concepts/controllers
+ */
 
 var Kodi = require('../lib/kodi');
 
+/**
+ * Check if the user have rights for the device
+ * @method haveRights
+ * @param userId
+ * @param deviceId
+ * @param callback
+ */
 var haveRights = function(userId, deviceId, callback){
 	KodiDevice.findOne({user: userId, id: deviceId}, callback);
 }
 
+/**
+ * Check the connection status of device
+ * Update the database when the status is changed
+ * @method connectionStatus
+ * @param err
+ * @param device
+ * @param callback
+ */
 var connectionStatus = function(err, device, callback){
 	if(err == 'disconnected' && device.connected != 0){
 		return KodiDevice.update({id: device.id}, {connected: 0}, callback);
@@ -17,6 +36,29 @@ var connectionStatus = function(err, device, callback){
 
 module.exports = {
 
+	/**
+	 * Download a music
+	 * @method music
+	 * @param req
+	 * @param res
+	 * @param next
+	 */
+	music : function(req, res, next){
+		//sails-util-mvcsloader bug ?
+		sails.log.debug(req.allParams());
+		var name = req.param('name') || req.param('id');
+
+		console.log(name);
+		return res.sendfile(sails.config.music.folder + name);
+	},
+
+	/**
+	 * Get all devices
+	 * @method index
+	 * @param req
+	 * @param res
+	 * @param next
+	 */
 	index : function(req, res, next){
 		KodiService.index(req.session.User.id, function(err, value){
 			if(err) return res.json(err);
@@ -25,6 +67,13 @@ module.exports = {
 		});
 	},
 
+	/**
+	 * Remote action on device
+	 * @method remote
+	 * @param req
+	 * @param res
+	 * @param next
+	 */
 	remote : function(req, res, next){
 		haveRights(req.session.User.id, req.param('id'), function(err, device){
 			if(err) return res.json(err);
@@ -39,6 +88,13 @@ module.exports = {
 		});
 	},
 
+	/**
+	 * Update a device
+	 * @method update
+	 * @param req
+	 * @param res
+	 * @param next
+	 */
 	update : function(req, res, next){
 		var update = {
 			name : req.param('name'),
@@ -67,7 +123,13 @@ module.exports = {
 		});
 	},
 
-
+	/**
+	 * Destroy a device
+	 * @method index
+	 * @param req
+	 * @param res
+	 * @param next
+	 */
 	destroy : function(req, res, next){
 		haveRights(req.session.User.id, req.param('id'), function(err, device){
 			if(err) return res.json(err);
@@ -107,6 +169,13 @@ module.exports = {
 		});
 	},
 
+	/**
+	 * Add a devices
+	 * @method index
+	 * @param req
+	 * @param res
+	 * @param next
+	 */
 	add : function(req, res, next){
 		var device = {
 			name : req.param('name'),
