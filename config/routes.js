@@ -8,6 +8,5 @@ module.exports.routes = {
   '/kodi/add': 'KodiController.add',
   '/kodi/remote': 'KodiController.remote',
   '/kodi/destroy': 'KodiController.destroy',
-  '/kodi/update': 'KodiController.update',
-  '/kodi/music/:name': 'KodiController.music'
+  '/kodi/update': 'KodiController.update'
 };

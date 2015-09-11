@@ -6,18 +6,18 @@ module.exports = function (sails) {
   sails.config.Event.on('sailsReady', function(){
 
     KodiInstall.actionType(function(err){
-      if(err)return sails.log.error('Install Kodi actionType failed', err);
-      sails.log.info('Install Kodi actionType OK');
+      if(err)return sails.log.error('Kodi : Install actionType failed :', err);
+      sails.log.info('Kodi : Install actionType OK');
     });
 
     KodiInstall.launcherType(function(err){
-      if(err)return sails.log.error('Install Kodi launcherType failed', err);
-      sails.log.info('Install Kodi launcherType OK');
+      if(err)return sails.log.error('Kodi : Install launcherType failed :', err);
+      sails.log.info('Kodi : Install launcherType OK');
     });
     
     KodiInstall.event(function(err){
-      if(err)return sails.log.error('Install Kodi event failed', err);
-      sails.log.info('Install Kodi event OK');
+      if(err)return sails.log.error('Kodi : Install event failed :', err);
+      sails.log.info('Kodi : Install event OK');
     });
 
   });  

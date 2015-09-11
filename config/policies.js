@@ -4,9 +4,6 @@
  */
 
 module.exports.policies = {
-	KodiController: {
-		'*': ['checkToken', 'Human'],
-		music: ['isLocalClient']
-	}
+	KodiController: ['checkToken', 'Human']
 };
 

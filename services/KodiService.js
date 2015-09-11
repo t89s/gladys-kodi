@@ -9,6 +9,44 @@ var Kodi = require('../lib/kodi');
 var hostname = require("os").hostname();
 var port = sails.config.proxyPort || sails.config.port;
 
+var emitClientUpdate = function(deviceId){
+	KodiDevice.find({id: deviceId})
+		.populate('user')
+		.populate('room')
+		.exec(function(err, devices){
+			var device = devices[0];
+
+			SocketService.sendDesktopMessageUser(device.user.id, 'kodi:update', device, function(){});
+		});
+};
+
+Kodi.on('connected', function(device){
+	sails.log.info('Kodi : Device connected :', device.host);
+
+	Kodi.device(device)
+		.then(function(api){
+			sails.config.kodi.eventLauncherTypes.forEach(function(eventLauncherType){
+				api.api.on(eventLauncherType.name, function(){
+					ScenarioService.launcher(eventLauncherType.code, device.id);
+				});
+			});
+		});
+	
+	KodiDevice.update({id: device.id}, {connected: 1}, function(){
+		emitClientUpdate(device.id);
+	});
+
+});
+
+Kodi.on('disconnected', function(device){
+	sails.log.warn('Kodi : Device disconnected :', device.host);
+
+	KodiDevice.update({id: device.id}, {connected: 0}, function(err, value){
+		emitClientUpdate(device.id);
+	});
+});
+
+
 module.exports = {
 
 	/**
@@ -39,11 +77,14 @@ module.exports = {
 		KodiDevice.findOne({id: deviceId}).exec(function(err, device){
 			if(err) return callback(err);
 
-			Kodi.api(device, function(err, api){
-				if(err) return callback(err);
-
-				api.remote(method, callback);
-			});		
+			Kodi.device(device)
+				.then(function(api){
+					return api.remoteAsync(method);
+				})
+				.then(function(){
+					callback();
+				})
+				.catch(callback);
 		});
 	},
 
@@ -59,11 +100,14 @@ module.exports = {
 		KodiDevice.findOne({id: deviceId}).exec(function(err, device){
 			if(err) return callback(err);
 
-			Kodi.api(device, function(err, api){
-				if(err) return callback(err);
-
-				api.openFile(file, callback);
-			});
+			Kodi.device(device)
+				.then(function(api){
+					return api.openFileAsync(file);
+				})
+				.then(function(){
+					callback();
+				})
+				.catch(callback);
 		});
 	},
 
@@ -77,7 +121,7 @@ module.exports = {
 	playMusic : function(deviceId, musicName, callback){
 		callback = callback || function(){};
 
-		var urlMusic = "http://"+ hostname +':'+ port +'/kodi/music/'+ musicName;
+		var urlMusic = 'http://'+ hostname +':'+ port +'/music/'+ musicName;
 		KodiService.playFile(deviceId, urlMusic, callback);
 	}
 

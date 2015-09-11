@@ -10,3 +10,16 @@
 .row_remote.btn-circle .btn{
 	border-radius:25px;
 }
+
+.modal-kodi{
+    overflow: auto;
+    display: block; 
+    background:rgba(0,0,0,0.4)
+}
+
+.nav-tabs-custom-kodi{
+	box-shadow:none;
+}
+.nav-tabs-custom-kodi .nav-tabs{
+	margin-bottom: 20px;
+}

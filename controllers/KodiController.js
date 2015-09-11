@@ -13,44 +13,14 @@ var Kodi = require('../lib/kodi');
  * @param callback
  */
 var haveRights = function(userId, deviceId, callback){
-	KodiDevice.findOne({user: userId, id: deviceId}, callback);
-}
-
-/**
- * Check the connection status of device
- * Update the database when the status is changed
- * @method connectionStatus
- * @param err
- * @param device
- * @param callback
- */
-var connectionStatus = function(err, device, callback){
-	if(err == 'disconnected' && device.connected != 0){
-		return KodiDevice.update({id: device.id}, {connected: 0}, callback);
-	}
-	if(!err && device.connected != 1){
-		return KodiDevice.update({id: device.id}, {connected: 1}, callback);
-	}
-	callback(err, device);
+	KodiDevice.findOne({user: userId, id: deviceId}, function(err, device){
+		if(err || !device)return callback('not allowed');
+		callback(null, device);
+	});
 }
 
 module.exports = {
 
-	/**
-	 * Download a music
-	 * @method music
-	 * @param req
-	 * @param res
-	 * @param next
-	 */
-	music : function(req, res, next){
-		//sails-util-mvcsloader bug ?
-		sails.log.debug(req.allParams());
-		var name = req.param('name') || req.param('id');
-
-		console.log(name);
-		return res.sendfile(sails.config.music.folder + name);
-	},
 
 	/**
 	 * Get all devices
@@ -61,7 +31,7 @@ module.exports = {
 	 */
 	index : function(req, res, next){
 		KodiService.index(req.session.User.id, function(err, value){
-			if(err) return res.json(err);
+			if(err) return res.json(400, err);
 
 			return res.json(value);
 		});
@@ -76,14 +46,12 @@ module.exports = {
 	 */
 	remote : function(req, res, next){
 		haveRights(req.session.User.id, req.param('id'), function(err, device){
-			if(err) return res.json(err);
+			if(err) return res.json(400, err);
 
 			KodiService.remote(device.id, req.param('method'), function(err, value){
-				connectionStatus(err, device, function(err){
-					if(err) return res.json(err);
+				if(err) return res.json(400, err);
 
-					return res.json(value);
-				});
+				return res.json(value);
 			});
 		});
 	},
@@ -105,18 +73,22 @@ module.exports = {
 		};
 
 		haveRights(req.session.User.id, req.param('id'), function(err, device){
-			if(err) return res.json(err);
+			if(err) return res.json(400, err);
 
 			KodiDevice.update({id: device.id}, update, function(err, value){
-				if(err) return res.json(err);
+				if(err) return res.json(400, err);
 
 				KodiDevice.findOne({user: req.session.User.id, id: req.param('id')})
 					.populate('user')
 					.populate('room')
 					.exec(function(err, value){
-						if(err) return res.json(err);
+						if(err) return res.json(400, err);
 
 						return res.json(value);
+
+						Kodi.device(value)
+							.then(function(){})
+							.catch(function(){});
 					});
 
 			});
@@ -132,11 +104,11 @@ module.exports = {
 	 */
 	destroy : function(req, res, next){
 		haveRights(req.session.User.id, req.param('id'), function(err, device){
-			if(err) return res.json(err);
+			if(err) return res.json(400, err);
 
 			/* Delete all Launcher/state/action associate with this device */
 			LauncherType.find({or: sails.config.kodi.launcherTypes}, function(err, launchersTypes){
-				if(err) return res.json(err);
+				if(err) return res.json(400, err);
 
 				var find_launchers = [];
 				for(var i = 0; i < launchersTypes.length; i++){
@@ -144,7 +116,7 @@ module.exports = {
 				}
 
 				Launcher.destroy({or: find_launchers}, function(err, launchers){
-					if(err) return callback(err);
+					if(err) return res.json(400, err);
 
 					var find = [];
 					for(var i = 0; i < launchers.length; i++){
@@ -152,13 +124,13 @@ module.exports = {
 					}
 
 					Action.destroy({or: find}, function(err, actions){
-						if(err) return callback(err);
+						if(err) return res.json(400, err);
 
 						State.destroy({or: find}, function(err, state){
-							if(err) return res.json(err);
+							if(err) return res.json(400, err);
 
 							KodiDevice.destroy({id: device.id}, function(err, value){
-								if(err) return res.json(err);
+								if(err) return res.json(400, err);
 
 								return res.json(value);
 							});
@@ -186,22 +158,19 @@ module.exports = {
 		};
 
 		KodiDevice.create(device, function(err, value){
-			if(err) return res.json(err);
+			if(err) return res.json(400, err);
 
 			KodiDevice.findOne({user: req.session.User.id, id: value.id})
 				.populate('user')
 				.populate('room')
 				.exec(function(err, value){
-					if(err) return res.json(err);
+					if(err) return res.json(400, err);
 
-					Kodi.event(value, function(err){
-						connectionStatus(err, value, function(err){
-							if(err) return res.json(err);
+					res.json(value);
 
-							return res.json(value);
-						});
-					});
-
+					Kodi.device(value)
+							.then(function(){})
+							.catch(function(){});
 				});
 
 		});

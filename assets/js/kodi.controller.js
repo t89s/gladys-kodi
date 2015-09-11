@@ -5,10 +5,10 @@
     .module('app')
     .controller('kodiController', kodiController);
 
-  kodiController.$inject = ['kodiService','roomService'];
+  kodiController.$inject = ['kodiService','roomService', '$timeout'];
 
-  function kodiController(kodiService, roomService){
-  	/* jshint validthis: true */
+  function kodiController(kodiService, roomService, $timeout){
+		/* jshint validthis: true */
 		var vm = this;
 
 		/* Method */
@@ -22,26 +22,29 @@
 		vm.devices = [];
 		vm.rooms = [];
 		vm.deviceRemote = {};
+		vm.error = {};
 
 		/* Template config */
 		vm.view = 'remote';
-		vm.settings_view = 'devices';
+		vm.modal = false;
 
 		/* Form */
 		vm.new_device = {};
 		vm.device = {};
+		var device = {};
 
 		activate();
 
 		function activate() {
 			getDevices();
 			getRooms();
+			waitUpdate();
 		}
 
-		function getDevices(){   			
+		function getDevices(){
 			return kodiService.getDevices()
-				.then(function(data){
-					vm.devices = data.data;
+				.then(function(devices){
+					vm.devices = devices;
 				});
 		}
 
@@ -52,58 +55,66 @@
         });
     }
 
-		function remoteDevice(method){
-			return kodiService.remoteDevice(vm.deviceRemote.id, method);
-		}
-
-		function destroyDevice(id){
-			return kodiService.destroyDevice(id).
-				then(function(data){
-					if(data.data[0].id){
-						var i = indexDeviceById(data.data[0].id);
-						vm.devices.splice(i, 1);
+    function waitUpdate(){
+			kodiService.waitUpdate(function(data){
+				$timeout(function(){
+					for(var i = 0; i < vm.devices.length; i++){
+						if(vm.devices[i].id == data.id){
+							vm.devices[i] = data;
+							break;
+						}
 					}
 				});
+			});
+    }
+
+		function remoteDevice(method){
+			return kodiService.remoteDevice(vm.deviceRemote, method);
+		}
+
+		function destroyDevice(device){
+			setError('destroyDevice', false);
+
+			return kodiService.destroyDevice(device)
+				.then(function(){
+					vm.devices.splice(vm.devices.indexOf(device), 1);
+				})
+				.catch(setError.bind(null, 'destroyDevice'));
 		}
 
 		function updateDevice(){
-			return kodiService.updateDevice(vm.device).
-				then(function(data){
-					if(data.data.id){
-						var i = indexDeviceById(data.data.id);
-						vm.devices[i] = data.data;
-						vm.device = {};
-						vm.settings_view = 'devices';
-					}
-				});
+			setError('updateDevice', false);
+
+			return kodiService.updateDevice(vm.device)
+				.then(function(data){
+						vm.devices.splice(vm.devices.indexOf(device), 1, data);
+						vm.modal = false;
+				})
+				.catch(setError.bind(null, 'updateDevice'));
 		}
 
     function addDevice(){
-			return kodiService.addDevice(vm.new_device).
-				then(function(data){
-					if(data.data.id){
-						vm.devices.push(data.data);
-						vm.new_device = {};
-						vm.settings_view = 'devices';
-					}
-				});
+			setError('addDevice', false);
+
+			return kodiService.addDevice(vm.new_device)
+				.then(function(data){
+					vm.devices.push(data);
+					vm.new_device = {};
+					vm.modal = false;
+				})
+				.catch(setError.bind(null, 'addDevice'));
 		}
 
-		function viewEdit(device){
-			vm.device = angular.copy(device);
+		function viewEdit(deviceObj){
+			device = deviceObj;
+			vm.device = angular.copy(deviceObj);
 			vm.device.user = device.user.id;
 			vm.device.room = device.room.id;
-			vm.settings_view = 'device';
+			vm.modal = 'edit';
 		}
 
-		function indexDeviceById(id){
-			for(var i = 0; i < vm.devices.length; i++){
-				if(vm.devices[i].id == id){
-					return i;
-				}
-			}
-			return -1;
+		function setError(key, err){
+			vm.error[key] = err;
 		}
-
   }
 })();
