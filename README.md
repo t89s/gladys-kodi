@@ -17,7 +17,7 @@ Launch action:
 ##Installation
 ```bash
 # Go to the hooks directory
-$ cd api/hooks
+$ cd gladys/api/hooks
 
 # Clone the repository
 $ git clone https://github.com/Time-Lords/gladys-kodi.git kodi
@@ -25,6 +25,9 @@ $ cd kodi
 
 # Install NPM dependencies
 $ npm install
+
+# Restart Gladys
+$ sudo pm2 restart gladys
 ```
 ##Usage
 
@@ -33,5 +36,5 @@ $ npm install
 * Enabled the option "Allow programs on other systems to control XBMC"
 
 **On Gladys**
-* Go to Dashboard => XBMC/Kodi => Settings => Add device.
+* Go to Dashboard => XBMC/Kodi => Devices => Add device.
 *(The default port is 9090)*
