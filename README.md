@@ -1,40 +1,20 @@
+# Gladys Kodi
+Require Gladys >= 3.3.2
+
 ##Features
-Dashboard:
-* Remote control
-* Edit device
 
-Launch scenario:
-* When Kodi play a media
-* When Kodi pause a media
-* When Kodi stop a media
+**Launch scenario:**
 
-Launch action:
-* Play a music to Kodi
+- When Kodi stop a media (status:0)
+- When Kodi pause a media (status:1)
+- When Kodi play a media (status:2)
 
 
-**The scenario events works when you use another remote control.** (Tv remote control, App ...)
-
-##Installation
-```bash
-# Go to the hooks directory
-$ cd gladys/api/hooks
-
-# Clone the repository
-$ git clone https://github.com/Time-Lords/gladys-kodi.git kodi
-$ cd kodi
-
-# Install NPM dependencies
-$ npm install
-
-# Restart Gladys
-$ sudo pm2 restart gladys
-```
-##Usage
-
-**On Kodi**
-* Go to Settings => Services => Remote Control.
-* Enabled the option "Allow programs on other systems to control XBMC"
-
-**On Gladys**
-* Go to Dashboard => XBMC/Kodi => Devices => Add device.
-*(The default port is 9090)*
+## Installation
+- Install the module in Gladys
+- Reboot Gladys
+- In Kodi, go to Settings => Services => Remote Control then enabled the option "Allow programs on other systems to control XBMC"
+- In Gladys, go to "Parameters" => "Parameters" => "Parameters" in the dashboard, and create parameters:
+ - `kodi_devices` host:port separated by comma. (raspbmc.local:9090,192.168.0.1:9090)
+- In Gladys, go to "Modules" => "Installed modules", and click on the configure button.
+- Your device(s) should be available(s) in devices page, you can update the room of device(s).

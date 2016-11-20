@@ -1,11 +1,10 @@
 {
   "name": "Gladys-Kodi",
-  "version": "0.2.0",
-  "description": "Kodi remote, events and actions for Gladys",
+  "version": "0.3.0",
+  "description": "Kodi events for Gladys",
   "keywords": [],
   "dependencies": {
     "bluebird": "^2.10.0",
-    "sails-util-mvcsloader": "~0.3.0",
     "xbmc": "^0.4.2"
   },
   "author": "TimeLord",
