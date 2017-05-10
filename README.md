@@ -1,7 +1,7 @@
 # Gladys Kodi
 Require Gladys >= 3.3.2
 
-##Features
+## Features
 
 **Launch scenario:**
 
